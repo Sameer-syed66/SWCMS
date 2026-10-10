@@ -1,24 +1,21 @@
 import api from "./api";
 
 export const complaintService = {
-  async list(params = {}) {
-    const response = await api.get("/complaints", { params });
-    return response.data;
-  },
-  async get(id) {
-    const response = await api.get(`/complaints/${id}`);
-    return response.data;
-  },
-  async create(payload) {
+  async submit(payload) {
     const response = await api.post("/complaints", payload);
     return response.data;
   },
-  async update(id, payload) {
-    const response = await api.put(`/complaints/${id}`, payload);
+  async track(trackingCode) {
+    const response = await api.get(`/complaints/track/${encodeURIComponent(trackingCode)}`);
     return response.data;
   },
-  async remove(id) {
-    const response = await api.delete(`/complaints/${id}`);
+  async list(status) {
+    const params = status ? { status } : {};
+    const response = await api.get("/complaints", { params });
+    return response.data;
+  },
+  async updateStatus(id, status, remarks = "") {
+    const response = await api.put(`/complaints/${id}/status`, { status, remarks });
     return response.data;
   }
 };

@@ -1,24 +1,16 @@
 import api from "./api";
 
 export const notificationService = {
-  async list(params = {}) {
-    const response = await api.get("/notifications", { params });
+  async list() {
+    const response = await api.get("/notifications");
     return response.data;
   },
-  async get(id) {
-    const response = await api.get(`/notifications/${id}`);
+  async markRead(id) {
+    const response = await api.put(`/notifications/${id}/read`);
     return response.data;
   },
-  async create(payload) {
-    const response = await api.post("/notifications", payload);
-    return response.data;
-  },
-  async update(id, payload) {
-    const response = await api.put(`/notifications/${id}`, payload);
-    return response.data;
-  },
-  async remove(id) {
-    const response = await api.delete(`/notifications/${id}`);
+  async markAllRead() {
+    const response = await api.put("/notifications/read-all");
     return response.data;
   }
 };

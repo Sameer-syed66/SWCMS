@@ -1,7 +1,42 @@
+import { useState, useEffect } from "react";
 import { ArrowRight, BarChart3, BellRing, CheckCircle2, MapPin, Recycle, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { reportService } from "../services/reportService";
+import { binService } from "../services/binService";
 
 export default function LandingPage() {
+  const [metrics, setMetrics] = useState({
+    efficiency: 85,
+    attentionCount: 3,
+    bins: [45, 68, 52, 79, 74, 91, 62, 30]
+  });
+
+  useEffect(() => {
+    loadLiveOverview();
+    const interval = setInterval(() => {
+      loadLiveOverview();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function loadLiveOverview() {
+    try {
+      const [sumRes, binsRes] = await Promise.all([
+        reportService.getSummary(),
+        binService.list()
+      ]);
+      const eff = sumRes?.summary?.collection_efficiency ?? 85;
+      const att = sumRes?.summary?.active_alerts ?? 3;
+      const binList = binsRes?.bins || [];
+      const levels = binList.length > 0 ? binList.slice(0, 8).map(b => Math.round(b.current_level)) : [45, 68, 52, 79, 74, 91, 62, 30];
+      setMetrics({
+        efficiency: Math.round(eff),
+        attentionCount: att,
+        bins: levels
+      });
+    } catch {}
+  }
+
   return (
     <div className="landing">
       <header className="landing-nav">
@@ -27,13 +62,33 @@ export default function LandingPage() {
         </div>
         <div className="hero-visual">
           <div className="dashboard-preview">
-            <div className="preview-top"><span>Live waste overview</span><span className="live-dot">● Live</span></div>
-            <div className="preview-number">82<span>%</span></div>
-            <p>Collection efficiency</p>
-            <div className="mini-bars">
-              {[45, 67, 52, 81, 73, 91, 62].map((v, i) => <div key={i} style={{height:`${v}%`}} />)}
+            <div className="preview-top">
+              <span>Live waste overview</span>
+              <span className="live-dot" style={{ animation: "pulse 1.5s infinite" }}>● Live Telemetry</span>
             </div>
-            <div className="preview-alert"><BellRing size={17} /><div><b>3 bins need attention</b><span>Prioritized automatically</span></div></div>
+            <div className="preview-number">{metrics.efficiency}<span>%</span></div>
+            <p>Collection efficiency</p>
+            <div className="mini-bars" style={{ alignItems: "flex-end", height: "65px", gap: "6px" }}>
+              {metrics.bins.map((v, i) => (
+                <div
+                  key={i}
+                  style={{
+                    height: `${Math.max(8, v)}%`,
+                    background: v >= 85 ? "#c93f3f" : v >= 70 ? "#b77816" : "var(--primary)",
+                    borderRadius: "3px",
+                    transition: "height 0.6s ease"
+                  }}
+                  title={`Bin Sensor #${i+1}: ${v}%`}
+                />
+              ))}
+            </div>
+            <div className="preview-alert">
+              <BellRing size={17} color={metrics.attentionCount > 0 ? "#c93f3f" : "var(--primary)"} />
+              <div>
+                <b>{metrics.attentionCount} {metrics.attentionCount === 1 ? "bin needs" : "bins need"} attention</b>
+                <span>Prioritized automatically</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

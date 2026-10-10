@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { authService } from "../services/authService";
 
 const AuthContext = createContext(null);
 
@@ -12,24 +13,32 @@ export function AuthProvider({ children }) {
   });
 
   useEffect(() => {
-    if (user) localStorage.setItem("swcms_user", JSON.stringify(user));
-    else localStorage.removeItem("swcms_user");
+    if (user) {
+      localStorage.setItem("swcms_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("swcms_user");
+      localStorage.removeItem("swcms_token");
+    }
   }, [user]);
 
-  const login = async (email, password, role) => {
-    if (!email || !password) throw new Error("Email and password are required.");
+  const login = async (emailOrUsername, password, role) => {
+    if (!emailOrUsername || !password) {
+      throw new Error("Username/Email and password are required.");
+    }
 
-    const account = {
-      email,
-      name: role === "admin" ? "System Administrator" : "Municipal Authority",
-      role
-    };
-
-    setUser(account);
-    return account;
+    const data = await authService.login(emailOrUsername, password, role);
+    if (data.token) {
+      localStorage.setItem("swcms_token", data.token);
+    }
+    setUser(data.user);
+    return data.user;
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    localStorage.removeItem("swcms_token");
+    localStorage.removeItem("swcms_user");
+    setUser(null);
+  };
 
   const value = useMemo(() => ({ user, login, logout }), [user]);
 
