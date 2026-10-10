@@ -155,7 +155,7 @@ export default function LoginPage() {
                           type="text"
                           value={signupData.full_name}
                           onChange={e => setSignupData({ ...signupData, full_name: e.target.value })}
-                          placeholder="e.g. Ramesh Kumar"
+                          placeholder="Enter your full name"
                           required
                         />
                       </div>
@@ -170,7 +170,7 @@ export default function LoginPage() {
                             type="text"
                             value={signupData.username}
                             onChange={e => setSignupData({ ...signupData, username: e.target.value })}
-                            placeholder="e.g. officer_ramesh"
+                            placeholder="Choose a username"
                             required
                           />
                         </div>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                             type="tel"
                             value={signupData.phone}
                             onChange={e => setSignupData({ ...signupData, phone: e.target.value })}
-                            placeholder="e.g. 9876543210"
+                            placeholder="Phone number (optional)"
                           />
                         </div>
                       </label>
@@ -198,7 +198,7 @@ export default function LoginPage() {
                           type="email"
                           value={signupData.email}
                           onChange={e => setSignupData({ ...signupData, email: e.target.value })}
-                          placeholder="officer@swcms.com"
+                          placeholder="Enter your email address"
                           required
                         />
                       </div>
@@ -231,7 +231,7 @@ export default function LoginPage() {
                             type="password"
                             value={signupData.password}
                             onChange={e => setSignupData({ ...signupData, password: e.target.value })}
-                            placeholder="Min 6 characters"
+                            placeholder="Enter password (min 6 chars)"
                             required
                           />
                         </div>
@@ -245,7 +245,7 @@ export default function LoginPage() {
                             type="password"
                             value={signupData.confirmPassword}
                             onChange={e => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                            placeholder="Re-type password"
+                            placeholder="Confirm your password"
                             required
                           />
                         </div>
@@ -289,14 +289,14 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className={role === "authority" ? "selected" : ""}
-                  onClick={() => setRole("authority")}
+                  onClick={() => { setRole("authority"); setError(""); setEmail(""); setPassword(""); }}
                 >
                   <UserRound size={17}/> Authority
                 </button>
                 <button
                   type="button"
                   className={role === "admin" ? "selected" : ""}
-                  onClick={() => setRole("admin")}
+                  onClick={() => { setRole("admin"); setError(""); setEmail(""); setPassword(""); }}
                 >
                   <ShieldCheck size={17}/> Administrator
                 </button>
@@ -311,7 +311,8 @@ export default function LoginPage() {
                       type="text"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder={role === "admin" ? "Swcms or admin@swcms.com" : "authority1 or rahul@swcms.com"}
+                      placeholder="Enter your username or email"
+                      autoComplete="username"
                       required
                     />
                   </div>
@@ -325,7 +326,8 @@ export default function LoginPage() {
                       type="password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder={role === "admin" ? "Enter admin password (Swcms@123)" : "Enter your password"}
+                      placeholder="Enter your password"
+                      autoComplete="current-password"
                       required
                     />
                   </div>
@@ -351,7 +353,7 @@ export default function LoginPage() {
                     onClick={fillDemoAuthority}
                     title="Fill demo authority credentials"
                   >
-                    Demo Authority (authority1)
+                    Demo Authority
                   </button>
 
                   <div style={{ fontSize: "11px", color: "var(--muted)" }}>
