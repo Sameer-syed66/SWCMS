@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, BarChart3, BellRing, CheckCircle2, MapPin, Recycle, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
+import { ArrowRight, BarChart3, BellRing, CheckCircle2, Cpu, MapPin, Recycle, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { reportService } from "../services/reportService";
 import { binService } from "../services/binService";
@@ -40,8 +40,32 @@ export default function LandingPage() {
   return (
     <div className="landing">
       <header className="landing-nav">
-        <Link to="/" className="landing-brand"><span>♻</span> SWCMS</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <Link to="/" className="landing-brand"><span>♻</span> SWCMS</Link>
+          <Link
+            to="/smart-bin"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              background: "rgba(24, 121, 78, 0.14)",
+              color: "var(--primary)",
+              padding: "6px 12px",
+              borderRadius: "99px",
+              fontSize: "11px",
+              fontWeight: "800",
+              border: "1px solid rgba(24, 121, 78, 0.28)",
+              textDecoration: "none"
+            }}
+            title="Explore physical smart garbage bin hardware and IoT working mechanism"
+          >
+            <Cpu size={14} /> Smart Bin
+          </Link>
+        </div>
         <nav>
+          <Link to="/smart-bin" style={{ fontWeight: "700", color: "var(--primary)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <Cpu size={13} /> Smart Bin
+          </Link>
           <a href="#features">Features</a>
           <a href="#how-it-works">How it works</a>
           <Link to="/track-complaint">Track complaint</Link>

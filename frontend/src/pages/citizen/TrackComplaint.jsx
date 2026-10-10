@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Search, CheckCircle, Clock, MapPin, Tag, AlertCircle, FileText, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Cpu, Search, CheckCircle, Clock, MapPin, Tag, AlertCircle, FileText, CheckCircle2 } from "lucide-react";
 import { complaintService } from "../../services/complaintService";
 import StatusBadge from "../../components/StatusBadge";
 
@@ -61,9 +61,14 @@ export default function TrackComplaint() {
 
   return (
     <div className="public-form-page">
-      <Link to="/" className="public-back">
-        <ArrowLeft size={16} /> Back to Home
-      </Link>
+      <div style={{ position: "absolute", top: "24px", left: "28px", display: "flex", gap: "16px", alignItems: "center" }}>
+        <Link to="/" className="public-back" style={{ position: "static" }}>
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+        <Link to="/smart-bin" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "11px", fontWeight: "700", color: "var(--primary)" }}>
+          <Cpu size={14} /> Smart Bin
+        </Link>
+      </div>
 
       <div className="public-card track-card">
         <div className="form-heading">

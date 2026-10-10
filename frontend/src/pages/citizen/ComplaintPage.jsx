@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Copy, Send, Sparkles, MapPin, Tag, Phone, Mail, User } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Copy, Cpu, Send, Sparkles, MapPin, Tag, Phone, Mail, User } from "lucide-react";
 import { complaintService } from "../../services/complaintService";
 import { binService } from "../../services/binService";
 
@@ -84,9 +84,14 @@ export default function ComplaintPage() {
 
   return (
     <div className="public-form-page">
-      <Link to="/" className="public-back">
-        <ArrowLeft size={16} /> Back to Home
-      </Link>
+      <div style={{ position: "absolute", top: "24px", left: "28px", display: "flex", gap: "16px", alignItems: "center" }}>
+        <Link to="/" className="public-back" style={{ position: "static" }}>
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+        <Link to="/smart-bin" style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "11px", fontWeight: "700", color: "var(--primary)" }}>
+          <Cpu size={14} /> Smart Bin
+        </Link>
+      </div>
 
       <div className="public-card">
         {submittedId ? (

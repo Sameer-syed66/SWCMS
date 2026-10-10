@@ -1,5 +1,5 @@
-import { Bell, LogOut, Menu, UserCircle } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Bell, Cpu, LogOut, Menu, UserCircle } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const titles = {
@@ -29,6 +29,24 @@ export default function Navbar() {
         <h1>{titles[location.pathname] || "Dashboard"}</h1>
       </div>
       <div className="topbar-actions">
+        <Link
+          to="/smart-bin"
+          className="btn btn-outline btn-sm"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "11px",
+            fontWeight: "700",
+            padding: "6px 12px",
+            color: "var(--primary)",
+            borderColor: "rgba(24, 121, 78, 0.3)",
+            background: "rgba(24, 121, 78, 0.06)"
+          }}
+          title="Explore physical smart garbage bin hardware and IoT working mechanism"
+        >
+          <Cpu size={14} color="var(--primary)" /> Smart Bin
+        </Link>
         <button className="icon-btn" onClick={() => navigate(user?.role === "admin" ? "/admin" : "/authority")}>
           <Bell size={19} />
           <span className="notification-dot" />

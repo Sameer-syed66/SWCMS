@@ -1,4 +1,4 @@
-import { BarChart3, Bell, Boxes, ClipboardList, FileBarChart, Gauge, History, Home, LogOut, MessageSquareWarning, ShieldCheck, Truck, Users, X } from "lucide-react";
+import { BarChart3, Bell, Boxes, ClipboardList, Cpu, FileBarChart, Gauge, History, Home, LogOut, MessageSquareWarning, ShieldCheck, Truck, Users, X } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,7 +7,8 @@ const adminLinks = [
   ["/admin/authorities", "Authorities", Users],
   ["/admin/bins", "Manage Bins", Boxes],
   ["/admin/reports", "Reports", FileBarChart],
-  ["/admin/analytics", "Analytics", BarChart3]
+  ["/admin/analytics", "Analytics", BarChart3],
+  ["/smart-bin", "Smart Bin", Cpu]
 ];
 
 const authorityLinks = [
@@ -16,7 +17,8 @@ const authorityLinks = [
   ["/authority/complaints", "Complaints", MessageSquareWarning],
   ["/authority/bins", "Bin Status", Boxes],
   ["/authority/collection", "Collection", Truck],
-  ["/authority/history", "History", History]
+  ["/authority/history", "History", History],
+  ["/smart-bin", "Smart Bin", Cpu]
 ];
 
 export default function Sidebar() {

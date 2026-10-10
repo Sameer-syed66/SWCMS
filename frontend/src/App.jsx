@@ -17,6 +17,7 @@ import Collection from "./pages/authority/Collection";
 import CollectionHistory from "./pages/authority/CollectionHistory";
 import ComplaintPage from "./pages/citizen/ComplaintPage";
 import TrackComplaint from "./pages/citizen/TrackComplaint";
+import SmartBinExplorer from "./pages/SmartBinExplorer";
 
 function ProtectedLayout({ children, roles }) {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/smart-bin" element={<SmartBinExplorer />} />
       <Route path="/complaint" element={<ComplaintPage />} />
       <Route path="/track-complaint" element={<TrackComplaint />} />
 
