@@ -66,10 +66,10 @@ def record_bin_collection(bin_id, authority_id=None, remarks="Bin emptied succes
             # 4. Insert into collection_history
             cursor.execute(
                 """
-                INSERT INTO collection_history (bin_id, authority_id, collected_level, remarks, related_alert_id)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO collection_history (bin_id, authority_id, collected_level, remarks)
+                VALUES (%s, %s, %s, %s)
                 """,
-                (bin_id, authority_id, collected_level, remarks, related_alert_id)
+                (bin_id, authority_id, collected_level, remarks)
             )
 
             conn.commit()

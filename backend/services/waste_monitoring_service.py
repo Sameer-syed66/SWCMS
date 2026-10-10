@@ -81,31 +81,31 @@ def process_waste_reading(bin_id, waste_level):
                     cursor.execute(
                         """
                         UPDATE alerts
-                        SET waste_level = %s, message = %s, priority = %s
+                        SET message = %s, priority = %s
                         WHERE alert_id = %s
                         """,
-                        (waste_level, message, priority, existing_alert["alert_id"])
+                        (message, priority, existing_alert["alert_id"])
                     )
                 else:
                     # Create new alert
                     cursor.execute(
                         """
-                        INSERT INTO alerts (bin_id, alert_type, message, waste_level, priority, status)
-                        VALUES (%s, %s, %s, %s, %s, 'PENDING')
+                        INSERT INTO alerts (bin_id, alert_type, message, priority, status)
+                        VALUES (%s, %s, %s, %s, 'PENDING')
                         """,
-                        (bin_id, alert_type, message, waste_level, priority)
+                        (bin_id, alert_type, message, priority)
                     )
                     alert_generated = True
 
                     # Generate in-app notification for authorities
                     notif_title = f"{priority.title()} Waste Alert"
-                    notif_msg = f"{bin_data['bin_code']} is at {waste_level:.0f}% in {bin_data.get('area', 'operational area')}."
+                    notif_msg = f"{bin_data['bin_code']} is at {waste_level:.0f}% capacity ({bin_data['location']})."
                     cursor.execute(
                         """
-                        INSERT INTO notifications (title, message, priority, is_read)
-                        VALUES (%s, %s, %s, FALSE)
+                        INSERT INTO notifications (title, message, is_read)
+                        VALUES (%s, %s, FALSE)
                         """,
-                        (notif_title, notif_msg, priority)
+                        (notif_title, notif_msg)
                     )
                     notification_generated = True
 
@@ -259,7 +259,7 @@ def simulate_citywide_tick():
     if conn:
         try:
             cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT bin_id, current_level FROM garbage_bins WHERE operational_status = 'ACTIVE'")
+            cursor.execute("SELECT bin_id, current_level FROM garbage_bins")
             bins = cursor.fetchall()
             cursor.close()
             conn.close()

@@ -93,20 +93,20 @@ def get_analytics_data():
         try:
             cursor = conn.cursor(dictionary=True)
 
-            # Area-wise statistics
+            # Area/Location-wise statistics
             cursor.execute("""
-                SELECT area, COUNT(*) as bin_count, ROUND(AVG(current_level), 1) as avg_level
+                SELECT location as area, COUNT(*) as bin_count, ROUND(AVG(current_level), 1) as avg_level
                 FROM garbage_bins
-                GROUP BY area
+                GROUP BY location
             """)
             area_stats = cursor.fetchall()
 
             # Frequently overflowing bins
             cursor.execute("""
-                SELECT b.bin_id, b.bin_code, b.location, b.area, b.current_level, COUNT(a.alert_id) as alert_count
+                SELECT b.bin_id, b.bin_code, b.location, b.current_level, COUNT(a.alert_id) as alert_count
                 FROM garbage_bins b
                 LEFT JOIN alerts a ON b.bin_id = a.bin_id
-                GROUP BY b.bin_id, b.bin_code, b.location, b.area, b.current_level
+                GROUP BY b.bin_id, b.bin_code, b.location, b.current_level
                 ORDER BY alert_count DESC, b.current_level DESC
                 LIMIT 5
             """)

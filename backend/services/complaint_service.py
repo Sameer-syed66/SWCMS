@@ -44,10 +44,10 @@ def submit_complaint(citizen_name, category, description, location, citizen_emai
             cursor = conn.cursor(dictionary=True)
             cursor.execute(
                 """
-                INSERT INTO complaints (complaint_code, citizen_name, citizen_email, citizen_phone, category, description, location, bin_id, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'PENDING')
+                INSERT INTO complaints (complaint_code, citizen_name, citizen_email, description, location, status)
+                VALUES (%s, %s, %s, %s, %s, 'PENDING')
                 """,
-                (complaint_code, citizen_name.strip(), citizen_email, citizen_phone, category, description.strip(), location.strip(), bin_id)
+                (complaint_code, citizen_name.strip(), citizen_email, f"[{category}] {description.strip()}" if category else description.strip(), location.strip())
             )
 
             # Notification for authorities
@@ -55,8 +55,8 @@ def submit_complaint(citizen_name, category, description, location, citizen_emai
             notif_msg = f"Complaint {complaint_code} ({category}) reported at {location}."
             cursor.execute(
                 """
-                INSERT INTO notifications (title, message, priority, is_read)
-                VALUES (%s, %s, 'NORMAL', FALSE)
+                INSERT INTO notifications (title, message, is_read)
+                VALUES (%s, %s, FALSE)
                 """,
                 (notif_title, notif_msg)
             )
@@ -170,10 +170,10 @@ def update_complaint_status(complaint_id, new_status, remarks=None):
             cursor.execute(
                 """
                 UPDATE complaints
-                SET status = %s, resolution_remarks = %s, resolved_at = %s
+                SET status = %s, resolved_at = %s
                 WHERE complaint_id = %s
                 """,
-                (new_status, remarks, resolved_at, complaint_id)
+                (new_status, resolved_at, complaint_id)
             )
             conn.commit()
             cursor.close()

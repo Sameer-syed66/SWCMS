@@ -100,10 +100,10 @@ def create_bin():
             cursor = conn.cursor(dictionary=True)
             cursor.execute(
                 """
-                INSERT INTO garbage_bins (bin_code, location, area, warning_threshold, critical_threshold, capacity, status, operational_status)
-                VALUES (%s, %s, %s, %s, %s, %s, 'NORMAL', 'ACTIVE')
+                INSERT INTO garbage_bins (bin_code, location, capacity, status)
+                VALUES (%s, %s, %s, 'NORMAL')
                 """,
-                (bin_code, location, area, warning_threshold, critical_threshold, capacity)
+                (bin_code, location, capacity)
             )
             new_id = cursor.lastrowid
             conn.commit()
@@ -152,18 +152,12 @@ def update_bin(bin_id):
             if location:
                 updates.append("location = %s")
                 params.append(location)
-            if area:
-                updates.append("area = %s")
-                params.append(area)
-            if warning_threshold is not None:
-                updates.append("warning_threshold = %s")
-                params.append(float(warning_threshold))
-            if critical_threshold is not None:
-                updates.append("critical_threshold = %s")
-                params.append(float(critical_threshold))
-            if operational_status:
-                updates.append("operational_status = %s")
-                params.append(operational_status)
+            if data.get("capacity"):
+                updates.append("capacity = %s")
+                params.append(int(data.get("capacity")))
+            if data.get("status"):
+                updates.append("status = %s")
+                params.append(data.get("status"))
 
             if updates:
                 params.append(bin_id)
