@@ -135,7 +135,7 @@ def authenticate_user(username_or_email, password, role="authority"):
                     "role": "admin"
                 }
             }
-        return {"success": False, "error": "Invalid administrator credentials (use Swcms / Swcms@123)."}
+        return {"success": False, "error": "Invalid administrator username or password."}
 
     else:
         user = next((
@@ -144,7 +144,7 @@ def authenticate_user(username_or_email, password, role="authority"):
             or a["email"].lower() == username_or_email.lower()
         ), None)
         if not user:
-            return {"success": False, "error": "Authority account not found."}
+            return {"success": False, "error": "Invalid authority username or password."}
         if user.get("status") == "INACTIVE":
             return {"success": False, "error": "Your authority registration is pending Administrator approval. Please wait for an administrator to approve your account."}
         if verify_user_password(user["password_hash"], password, "authority"):
@@ -161,7 +161,7 @@ def authenticate_user(username_or_email, password, role="authority"):
                     "role": "authority"
                 }
             }
-        return {"success": False, "error": "Invalid authority password (default: Authority@123)."}
+        return {"success": False, "error": "Invalid authority username or password."}
 
 
 def require_role(allowed_roles=None):
