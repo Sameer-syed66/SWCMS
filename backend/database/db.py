@@ -82,8 +82,8 @@ class MemoryStore:
         self.administrators = [
             {
                 "admin_id": 1,
-                "username": "admin",
-                "password_hash": generate_password_hash("Admin@123"),
+                "username": "Swcms",
+                "password_hash": generate_password_hash("Swcms@123"),
                 "full_name": "System Administrator",
                 "email": "admin@swcms.com",
                 "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

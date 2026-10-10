@@ -131,6 +131,87 @@ def toggle_authority_status(authority_id):
     return jsonify({"message": "Authority not found"}), 404
 
 
+@admin_routes.route("/admin/authorities/<int:authority_id>/approve", methods=["PUT", "POST"])
+def approve_authority(authority_id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT full_name, username FROM authorities WHERE authority_id = %s", (authority_id,))
+            user = cursor.fetchone()
+            if not user:
+                cursor.close()
+                conn.close()
+                return jsonify({"message": "Authority not found"}), 404
+
+            cursor.execute("UPDATE authorities SET status = 'ACTIVE' WHERE authority_id = %s", (authority_id,))
+            cursor.execute(
+                """
+                INSERT INTO notifications (authority_id, title, message, is_read)
+                VALUES (%s, 'Authority Approved', %s, FALSE)
+                """,
+                (authority_id, f"Authority account for {user['full_name']} (@{user['username']}) has been approved and activated.")
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return jsonify({"message": f"Authority '{user['full_name']}' approved and activated successfully."}), 200
+        except Exception as e:
+            if conn:
+                conn.rollback()
+                conn.close()
+            return jsonify({"message": f"Error: {e}"}), 400
+
+    target = next((a for a in memory_store.authorities if a["authority_id"] == authority_id), None)
+    if target:
+        target["status"] = "ACTIVE"
+        memory_store.notifications.insert(0, {
+            "notification_id": max([n.get("notification_id", 0) for n in memory_store.notifications] or [0]) + 1,
+            "authority_id": authority_id,
+            "title": "Authority Approved",
+            "message": f"Authority account for {target['full_name']} (@{target['username']}) has been approved and activated.",
+            "priority": "MEDIUM",
+            "is_read": False,
+            "created_at": "Just now"
+        })
+        return jsonify({"message": f"Authority '{target['full_name']}' approved and activated successfully."}), 200
+
+    return jsonify({"message": "Authority not found"}), 404
+
+
+@admin_routes.route("/admin/authorities/<int:authority_id>/reject", methods=["PUT", "POST"])
+@admin_routes.route("/admin/authorities/<int:authority_id>", methods=["DELETE"])
+def reject_or_delete_authority(authority_id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT full_name, username FROM authorities WHERE authority_id = %s", (authority_id,))
+            user = cursor.fetchone()
+            if not user:
+                cursor.close()
+                conn.close()
+                return jsonify({"message": "Authority not found"}), 404
+
+            cursor.execute("DELETE FROM authorities WHERE authority_id = %s", (authority_id,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return jsonify({"message": f"Authority registration for '{user['full_name']}' was removed."}), 200
+        except Exception as e:
+            if conn:
+                conn.rollback()
+                conn.close()
+            return jsonify({"message": f"Error: {e}"}), 400
+
+    target = next((a for a in memory_store.authorities if a["authority_id"] == authority_id), None)
+    if target:
+        memory_store.authorities.remove(target)
+        return jsonify({"message": f"Authority registration for '{target['full_name']}' was removed."}), 200
+
+    return jsonify({"message": "Authority not found"}), 404
+
+
 @admin_routes.route("/admin/settings", methods=["GET"])
 def get_settings():
     conn = get_db_connection()

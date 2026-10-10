@@ -12,8 +12,8 @@ INSERT INTO administrators
 (username, password_hash, full_name, email)
 VALUES
 (
-    'admin',
-    'scrypt:32768:8:1$az21PxuKHvCkqAcl$5bd0b748866d0835d6ac671c40e0f4efe4eacb2757ec051a119548a8720d10c16263ec03649f44ef999c6c62597708f31df2cfe4e7183ad37c52f2d4fb47bac2',
+    'Swcms',
+    'scrypt:32768:8:1$90YK30AigeOL9kk3$517277e6456fe4b69ea04c68e7a23ed97f00b00eb1ee2b31e76419c77655ba3bd1880468b95a5f1938be65c787db76564202fed748f2a5d24ef8d1c0a86c659f',
     'System Administrator',
     'admin@swcms.com'
 );

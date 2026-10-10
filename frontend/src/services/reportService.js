@@ -21,6 +21,14 @@ export const reportService = {
     const response = await api.put(`/admin/authorities/${id}/status`, { status });
     return response.data;
   },
+  async approveAuthority(id) {
+    const response = await api.put(`/admin/authorities/${id}/approve`);
+    return response.data;
+  },
+  async rejectAuthority(id) {
+    const response = await api.put(`/admin/authorities/${id}/reject`);
+    return response.data;
+  },
   async getSettings() {
     const response = await api.get("/admin/settings");
     return response.data;

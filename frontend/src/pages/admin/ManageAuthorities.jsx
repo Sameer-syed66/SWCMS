@@ -62,6 +62,27 @@ export default function ManageAuthorities() {
     }
   }
 
+  async function handleApprove(auth) {
+    try {
+      await reportService.approveAuthority(auth.authority_id);
+      loadAuthorities();
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to approve authority.");
+    }
+  }
+
+  async function handleReject(auth) {
+    if (!window.confirm(`Are you sure you want to reject and remove registration for ${auth.full_name}?`)) return;
+    try {
+      await reportService.rejectAuthority(auth.authority_id);
+      loadAuthorities();
+    } catch (err) {
+      alert(err?.response?.data?.message || "Failed to reject authority.");
+    }
+  }
+
+  const pendingAuthorities = authorities.filter(a => a.status === "INACTIVE");
+
   const filtered = authorities.filter(a =>
     a.full_name.toLowerCase().includes(search.toLowerCase()) ||
     a.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,6 +102,85 @@ export default function ManageAuthorities() {
           <Plus size={15} /> Add Authority
         </button>
       </div>
+
+      {pendingAuthorities.length > 0 && (
+        <div style={{
+          background: "#fff9f0",
+          border: "1px solid #f6d299",
+          borderRadius: "12px",
+          padding: "18px 20px",
+          marginBottom: "20px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+            <span style={{
+              background: "#d97706",
+              color: "#fff",
+              fontSize: "10px",
+              fontWeight: "700",
+              borderRadius: "4px",
+              padding: "2px 6px"
+            }}>APPROVAL REQUIRED</span>
+            <strong style={{ fontSize: "14px", color: "#92400e" }}>
+              New Authority Registration Requests ({pendingAuthorities.length})
+            </strong>
+          </div>
+          <p style={{ fontSize: "12px", color: "#78350f", margin: "0 0 14px" }}>
+            New field officers have requested operational access. Review and approve their requests to grant them login permissions.
+          </p>
+
+          <div style={{ display: "grid", gap: "10px" }}>
+            {pendingAuthorities.map(pa => (
+              <div key={pa.authority_id} style={{
+                background: "#fff",
+                border: "1px solid #fed7aa",
+                borderRadius: "8px",
+                padding: "12px 16px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px"
+              }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <strong style={{ fontSize: "13px" }}>{pa.full_name}</strong>
+                    <code style={{ fontSize: "11px", background: "#f3f4f6", padding: "1px 6px", borderRadius: "4px" }}>
+                      @{pa.username}
+                    </code>
+                    <span style={{ fontSize: "11px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                      <MapPin size={12} color="var(--primary)" /> {pa.area || "Central Zone"}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "var(--muted)", marginTop: "4px", display: "flex", gap: "12px" }}>
+                    <span><Mail size={11} style={{ display: "inline" }} /> {pa.email}</span>
+                    {pa.phone && <span><Phone size={11} style={{ display: "inline" }} /> {pa.phone}</span>}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-primary"
+                    onClick={() => handleApprove(pa)}
+                    title="Approve registration and enable login"
+                  >
+                    <UserCheck size={14} /> Approve & Activate
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline"
+                    style={{ borderColor: "#f87171", color: "#dc2626" }}
+                    onClick={() => handleReject(pa)}
+                    title="Reject and remove this registration"
+                  >
+                    <UserX size={14} /> Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="toolbar">
         <div className="search-box">
@@ -140,21 +240,39 @@ export default function ManageAuthorities() {
                   </td>
                   <td>
                     <span className={`status-badge ${a.status === "ACTIVE" ? "active" : "critical"}`}>
-                      {a.status}
+                      {a.status === "ACTIVE" ? "ACTIVE" : "PENDING APPROVAL"}
                     </span>
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${a.status === "ACTIVE" ? "btn-outline" : "btn-primary"}`}
-                      onClick={() => handleToggleStatus(a)}
-                    >
-                      {a.status === "ACTIVE" ? (
-                        <><UserX size={13} /> Deactivate</>
-                      ) : (
-                        <><UserCheck size={13} /> Activate</>
-                      )}
-                    </button>
+                    {a.status === "ACTIVE" ? (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        onClick={() => handleToggleStatus(a)}
+                      >
+                        <UserX size={13} /> Deactivate
+                      </button>
+                    ) : (
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleApprove(a)}
+                          title="Approve and activate"
+                        >
+                          <UserCheck size={13} /> Approve
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline"
+                          style={{ borderColor: "#f87171", color: "#dc2626" }}
+                          onClick={() => handleReject(a)}
+                          title="Reject request"
+                        >
+                          <UserX size={13} /> Reject
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

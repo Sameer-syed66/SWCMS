@@ -41,7 +41,7 @@ def verify_user_password(stored_hash, password, role="authority"):
         return False
     if check_password_hash(stored_hash, password):
         return True
-    if role == "admin" and password in ("Admin@123", "admin", "admin123"):
+    if role == "admin" and password in ("Swcms@123", "Admin@123", "admin", "admin123"):
         return True
     if role == "authority" and password in ("Authority@123", "authority", "authority123"):
         return True
@@ -59,8 +59,8 @@ def authenticate_user(username_or_email, password, role="authority"):
             cursor = conn.cursor(dictionary=True)
             if role == "admin":
                 cursor.execute(
-                    "SELECT * FROM administrators WHERE username = %s OR email = %s LIMIT 1",
-                    (username_or_email, username_or_email)
+                    "SELECT * FROM administrators WHERE username = %s OR email = %s OR LOWER(username) = LOWER(%s) LIMIT 1",
+                    (username_or_email, username_or_email, username_or_email)
                 )
                 user = cursor.fetchone()
                 cursor.close()
@@ -83,8 +83,8 @@ def authenticate_user(username_or_email, password, role="authority"):
 
             else:  # authority
                 cursor.execute(
-                    "SELECT * FROM authorities WHERE username = %s OR email = %s LIMIT 1",
-                    (username_or_email, username_or_email)
+                    "SELECT * FROM authorities WHERE username = %s OR email = %s OR LOWER(username) = LOWER(%s) LIMIT 1",
+                    (username_or_email, username_or_email, username_or_email)
                 )
                 user = cursor.fetchone()
                 cursor.close()
@@ -93,7 +93,7 @@ def authenticate_user(username_or_email, password, role="authority"):
                 if not user:
                     return {"success": False, "error": "Authority account not found."}
                 if user.get("status") == "INACTIVE":
-                    return {"success": False, "error": "This authority account has been deactivated. Contact the administrator."}
+                    return {"success": False, "error": "Your authority registration is pending Administrator approval. Please wait for an administrator to approve your account."}
                 if verify_user_password(user["password_hash"], password, "authority"):
                     token = create_access_token(user["authority_id"], user["username"], "authority", user["full_name"], user["email"])
                     return {
@@ -116,7 +116,12 @@ def authenticate_user(username_or_email, password, role="authority"):
 
     # MemoryStore fallback
     if role == "admin":
-        user = next((a for a in memory_store.administrators if a["username"] == username_or_email or a["email"] == username_or_email), None)
+        user = next((
+            a for a in memory_store.administrators
+            if a["username"].lower() == username_or_email.lower()
+            or a["email"].lower() == username_or_email.lower()
+            or (username_or_email.lower() in ("swcms", "admin") and a["username"].lower() in ("swcms", "admin"))
+        ), None)
         if user and verify_user_password(user["password_hash"], password, "admin"):
             token = create_access_token(user["admin_id"], user["username"], "admin", user["full_name"], user["email"])
             return {
@@ -130,14 +135,18 @@ def authenticate_user(username_or_email, password, role="authority"):
                     "role": "admin"
                 }
             }
-        return {"success": False, "error": "Invalid administrator credentials (default: admin / Admin@123)."}
+        return {"success": False, "error": "Invalid administrator credentials (use Swcms / Swcms@123)."}
 
     else:
-        user = next((a for a in memory_store.authorities if a["username"] == username_or_email or a["email"] == username_or_email), None)
+        user = next((
+            a for a in memory_store.authorities
+            if a["username"].lower() == username_or_email.lower()
+            or a["email"].lower() == username_or_email.lower()
+        ), None)
         if not user:
-            return {"success": False, "error": "Authority not found (default: authority1 / Authority@123)."}
+            return {"success": False, "error": "Authority account not found."}
         if user.get("status") == "INACTIVE":
-            return {"success": False, "error": "This authority account is inactive."}
+            return {"success": False, "error": "Your authority registration is pending Administrator approval. Please wait for an administrator to approve your account."}
         if verify_user_password(user["password_hash"], password, "authority"):
             token = create_access_token(user["authority_id"], user["username"], "authority", user["full_name"], user["email"])
             return {
