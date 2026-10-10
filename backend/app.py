@@ -88,5 +88,6 @@ def health_check():
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("FLASK_PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    port = int(os.getenv("PORT") or os.getenv("FLASK_PORT") or 5000)
+    is_dev = os.getenv("FLASK_ENV") == "development"
+    app.run(host="0.0.0.0", port=port, debug=is_dev)
