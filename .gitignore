@@ -11,3 +11,9 @@ venv/
 
 # VS Code settings
 .vscode/
+
+# Frontend dependencies and build output
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
